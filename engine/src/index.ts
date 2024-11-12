@@ -5,7 +5,7 @@ import dotenv from 'dotenv'
 dotenv.config()
 
 async function main() {
-    const engine = new Engine(); 
+    const engine = new Engine();
     const redisClient = createClient();
     await redisClient.connect();
     console.log("connected to redis");
@@ -16,7 +16,7 @@ async function main() {
 
         }  else {
             engine.process(JSON.parse(response));
-        }        
+        }
     }
 
 }

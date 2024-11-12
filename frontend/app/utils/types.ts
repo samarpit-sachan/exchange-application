@@ -15,9 +15,10 @@ export interface Trade {
     "id": number,
     "isBuyerMaker": boolean,
     "price": string,
-    "quantity": string,
+    "volume": string,
     "quoteQuantity": string,
-    "timestamp": number
+    "time": number,
+    "currency_code": string
 }
 
 export interface Depth {

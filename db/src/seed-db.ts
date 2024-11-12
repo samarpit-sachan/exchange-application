@@ -1,16 +1,15 @@
 const { Client } = require('pg');
 
 const client = new Client({
-    user: 'your_user',
+    user: 'postgres',
     host: 'localhost',
-    database: 'my_database',
-    password: 'your_password',
-    port: 5432,
+    database: 'exchange_db',
+    password: '#Oneplus7',
+    port: 5434,
 });
 
 async function initializeDB() {
     await client.connect();
-
     await client.query(`
         DROP TABLE IF EXISTS "tata_prices";
         CREATE TABLE "tata_prices"(
@@ -19,9 +18,9 @@ async function initializeDB() {
             volume      DOUBLE PRECISION,
             currency_code   VARCHAR (10)
         );
-        
-        SELECT create_hypertable('tata_prices', 'time', 'price', 2);
-    `);
+        CREATE EXTENSION IF NOT EXISTS timescaledb;
+        SELECT create_hypertable('tata_prices', 'time');
+    `)
 
     await client.query(`
         CREATE MATERIALIZED VIEW IF NOT EXISTS klines_1m AS
@@ -35,7 +34,7 @@ async function initializeDB() {
             currency_code
         FROM tata_prices
         GROUP BY bucket, currency_code;
-    `);
+    `)
 
     await client.query(`
         CREATE MATERIALIZED VIEW IF NOT EXISTS klines_1h AS

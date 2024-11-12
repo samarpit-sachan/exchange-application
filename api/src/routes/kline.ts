@@ -1,13 +1,12 @@
 import { Client } from 'pg';
 import { Router } from "express";
-import { RedisManager } from "../RedisManager";
 
 const pgClient = new Client({
-    user: 'your_user',
+    user: 'postgres',
     host: 'localhost',
-    database: 'my_database',
-    password: 'your_password',
-    port: 5432,
+    database: 'exchange_db',
+    password: '#Oneplus7',
+    port: 5434,
 });
 pgClient.connect();
 
@@ -22,7 +21,7 @@ klineRouter.get("/", async (req, res) => {
             query = `SELECT * FROM klines_1m WHERE bucket >= $1 AND bucket <= $2`;
             break;
         case '1h':
-            query = `SELECT * FROM klines_1m WHERE  bucket >= $1 AND bucket <= $2`;
+            query = `SELECT * FROM klines_1h WHERE bucket >= $1 AND bucket <= $2`;
             break;
         case '1w':
             query = `SELECT * FROM klines_1w WHERE bucket >= $1 AND bucket <= $2`;

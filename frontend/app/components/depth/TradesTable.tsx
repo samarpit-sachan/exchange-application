@@ -1,16 +1,13 @@
 "use client";
 
-export const BidTable = ({ bids }: {bids: [string, string][]}) => {
-    let currentTotal = 0; 
-    const relevantBids = bids.slice(0, 15);
-    const bidsWithTotal: [string, string, number][] = relevantBids.map(([price, quantity]) => [price, quantity, currentTotal += Number(quantity)]);
-    const maxTotal = relevantBids.reduce((acc, [_, quantity]) => acc + Number(quantity), 0);
+export const TradesTable = ({ trades }: {trades: any[]}) => {
+    console.log("trades",trades)
     return <div>
-        {bidsWithTotal?.map(([price, quantity, total]) => <Bid maxTotal={maxTotal} total={total} key={price} price={price} quantity={quantity} />)}
+        {trades?.map((el) => <Trades key={el.price} price={el.price} quantity={el.quantity} time={el.time}/>)}
     </div>
 }
 
-function Bid({ price, quantity, total, maxTotal }: { price: string, quantity: string, total: number, maxTotal: number }) {
+function Trades({ price, quantity,time}: { price: string, quantity: string,time:any }) {
 
     return (
         <div
@@ -27,7 +24,7 @@ function Bid({ price, quantity, total, maxTotal }: { price: string, quantity: st
             position: "absolute",
             top: 0,
             left: 0,
-            width: `${(100 * total) / maxTotal}%`,
+            // width: `${(100 * total) / maxTotal}%`,
             height: "100%",
             background: "rgba(1, 167, 129, 0.325)",
             transition: "width 0.3s ease-in-out",
@@ -41,7 +38,7 @@ function Bid({ price, quantity, total, maxTotal }: { price: string, quantity: st
                     {quantity}
                 </div>
                 <div>
-                    {total.toFixed(2)}
+                    {time}
                 </div>
             </div>
         </div>

@@ -49,7 +49,7 @@ export class Engine {
         fs.writeFileSync("./snapshot.json", JSON.stringify(snapshotSnapshot));
     }
 
-    process({ message, clientId }: {message: MessageFromApi, clientId: string}) {
+    process({ message, clientId }: { message: MessageFromApi, clientId: string }) {
         switch (message.type) {
             case CREATE_ORDER:
                 try {
@@ -61,7 +61,7 @@ export class Engine {
                             executedQty,
                             fills
                         }
-                    });
+                    })
                 } catch (e) {
                     console.log(e);
                     RedisManager.getInstance().sendToApi(clientId, {
@@ -120,9 +120,9 @@ export class Engine {
                             remainingQty: 0
                         }
                     });
-                    
+
                 } catch (e) {
-                    console.log("Error hwile cancelling order", );
+                    console.log("Error hwile cancelling order",);
                     console.log(e);
                 }
                 break;
@@ -137,8 +137,8 @@ export class Engine {
                     RedisManager.getInstance().sendToApi(clientId, {
                         type: "OPEN_ORDERS",
                         payload: openOrders
-                    }); 
-                } catch(e) {
+                    });
+                } catch (e) {
                     console.log(e);
                 }
                 break;
@@ -177,7 +177,6 @@ export class Engine {
     }
 
     createOrder(market: string, price: string, quantity: string, side: "buy" | "sell", userId: string) {
-
         const orderbook = this.orderbooks.find(o => o.ticker() === market)
         const baseAsset = market.split("_")[0];
         const quoteAsset = market.split("_")[1];
@@ -196,7 +195,7 @@ export class Engine {
             side,
             userId
         }
-        
+
         const { fills, executedQty } = orderbook.addOrder(order);
         this.updateBalance(userId, baseAsset, quoteAsset, side, fills, executedQty);
 
@@ -272,7 +271,7 @@ export class Engine {
         const depth = orderbook.getDepth();
         const updatedBids = depth?.bids.filter(x => x[0] === price);
         const updatedAsks = depth?.asks.filter(x => x[0] === price);
-        
+
         RedisManager.getInstance().publishMessage(`depth@${market}`, {
             stream: `depth@${market}`,
             data: {
@@ -292,7 +291,7 @@ export class Engine {
         if (side === "buy") {
             const updatedAsks = depth?.asks.filter(x => fills.map(f => f.price).includes(x[0].toString()));
             const updatedBid = depth?.bids.find(x => x[0] === price);
-            console.log("publish ws depth updates")
+            console.log("publish ws depth updates buy")
             RedisManager.getInstance().publishMessage(`depth@${market}`, {
                 stream: `depth@${market}`,
                 data: {
@@ -303,17 +302,17 @@ export class Engine {
             });
         }
         if (side === "sell") {
-           const updatedBids = depth?.bids.filter(x => fills.map(f => f.price).includes(x[0].toString()));
-           const updatedAsk = depth?.asks.find(x => x[0] === price);
-           console.log("publish ws depth updates")
-           RedisManager.getInstance().publishMessage(`depth@${market}`, {
-               stream: `depth@${market}`,
-               data: {
-                   a: updatedAsk ? [updatedAsk] : [],
-                   b: updatedBids,
-                   e: "depth"
-               }
-           });
+            const updatedBids = depth?.bids.filter(x => fills.map(f => f.price).includes(x[0].toString()));
+            const updatedAsk = depth?.asks.find(x => x[0] === price);
+            console.log("publish ws depth updates sell")
+            RedisManager.getInstance().publishMessage(`depth@${market}`, {
+                stream: `depth@${market}`,
+                data: {
+                    a: updatedAsk ? [updatedAsk] : [],
+                    b: updatedBids,
+                    e: "depth"
+                }
+            });
         }
     }
 
@@ -336,7 +335,7 @@ export class Engine {
                 this.balances.get(userId)[baseAsset].available = this.balances.get(userId)?.[baseAsset].available + fill.qty;
 
             });
-            
+
         } else {
             fills.forEach(fill => {
                 // Update quote asset balance
@@ -365,7 +364,7 @@ export class Engine {
             }
             //@ts-ignore
             this.balances.get(userId)[quoteAsset].available = this.balances.get(userId)?.[quoteAsset].available - (Number(quantity) * Number(price));
-            
+
             //@ts-ignore
             this.balances.get(userId)[quoteAsset].locked = this.balances.get(userId)?.[quoteAsset].locked + (Number(quantity) * Number(price));
         } else {
@@ -374,7 +373,7 @@ export class Engine {
             }
             //@ts-ignore
             this.balances.get(userId)[baseAsset].available = this.balances.get(userId)?.[baseAsset].available - (Number(quantity));
-            
+
             //@ts-ignore
             this.balances.get(userId)[baseAsset].locked = this.balances.get(userId)?.[baseAsset].locked + Number(quantity);
         }
